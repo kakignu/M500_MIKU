@@ -1,0 +1,55 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install adb
+        run: |
+          brew install --cask android-platform-tools
+
+      - name: Create venv and install dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Build .app bundle
+        run: |
+          chmod +x build_app.sh
+          ./build_app.sh
+
+      - name: Create ZIP for distribution
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent "HiBy M500 Monitor.app" "HiBy_M500_Monitor.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HiBy-M500-Monitor-macOS
+          path: HiBy_M500_Monitor.zip
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: HiBy_M500_Monitor.zip
+          generate_release_notes: true
