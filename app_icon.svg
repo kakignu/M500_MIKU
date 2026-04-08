@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+    <linearGradient id="tealGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5de0d6"/>
+      <stop offset="100%" stop-color="#2a9d95"/>
+    </linearGradient>
+    <linearGradient id="pinkGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0c4d0"/>
+      <stop offset="100%" stop-color="#e8a3b5"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="15" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="url(#bg)"/>
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="#39c5bb" stroke-width="2" opacity="0.4"/>
+
+  <!-- Corner decorations -->
+  <path d="M120 36 L36 36 L36 120" fill="none" stroke="#39c5bb" stroke-width="2.5" opacity="0.6"/>
+  <path d="M392 36 L476 36 L476 120" fill="none" stroke="#e8a3b5" stroke-width="2.5" opacity="0.6"/>
+  <path d="M120 476 L36 476 L36 392" fill="none" stroke="#e8a3b5" stroke-width="2.5" opacity="0.6"/>
+  <path d="M392 476 L476 476 L476 392" fill="none" stroke="#39c5bb" stroke-width="2.5" opacity="0.6"/>
+
+  <!-- Background glow circles -->
+  <circle cx="200" cy="200" r="120" fill="#39c5bb" opacity="0.06"/>
+  <circle cx="340" cy="340" r="100" fill="#e8a3b5" opacity="0.05"/>
+
+  <!-- M500 device body (center) -->
+  <rect x="156" y="120" width="200" height="300" rx="24" fill="#1c2230" stroke="#39c5bb" stroke-width="2"/>
+
+  <!-- Screen -->
+  <rect x="172" y="140" width="168" height="220" rx="8" fill="#0a0e14"/>
+
+  <!-- Screen content: music player -->
+  <!-- Album art placeholder -->
+  <rect x="196" y="164" width="120" height="120" rx="8" fill="#39c5bb" opacity="0.15"/>
+  <!-- Music note -->
+  <g filter="url(#glow)">
+    <text x="256" y="236" text-anchor="middle" font-size="48" fill="#39c5bb" font-family="sans-serif">♪</text>
+  </g>
+  <!-- Song title bar -->
+  <rect x="196" y="296" width="120" height="6" rx="3" fill="#39c5bb" opacity="0.5"/>
+  <!-- Artist bar -->
+  <rect x="216" y="310" width="80" height="4" rx="2" fill="#e8a3b5" opacity="0.4"/>
+  <!-- Progress bar bg -->
+  <rect x="188" y="330" width="136" height="3" rx="1.5" fill="#30363d"/>
+  <!-- Progress bar fill -->
+  <rect x="188" y="330" width="82" height="3" rx="1.5" fill="url(#tealGlow)"/>
+  <!-- Play controls -->
+  <circle cx="226" cy="348" r="6" fill="none" stroke="#8b949e" stroke-width="1.5"/>
+  <circle cx="256" cy="348" r="10" fill="#39c5bb"/>
+  <polygon points="253,343 253,353 262,348" fill="#0d1117"/>
+  <circle cx="286" cy="348" r="6" fill="none" stroke="#8b949e" stroke-width="1.5"/>
+
+  <!-- Volume dial (right side) -->
+  <circle cx="376" cy="270" r="20" fill="#1c2230" stroke="#39c5bb" stroke-width="1.5"/>
+  <circle cx="376" cy="270" r="14" fill="#0d1117"/>
+  <line x1="376" y1="258" x2="376" y2="264" stroke="#39c5bb" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Side buttons (right) -->
+  <rect x="358" y="180" width="6" height="18" rx="3" fill="#e8a3b5" opacity="0.7"/>
+  <rect x="358" y="206" width="6" height="18" rx="3" fill="#8b949e" opacity="0.5"/>
+  <rect x="358" y="232" width="6" height="18" rx="3" fill="#8b949e" opacity="0.5"/>
+
+  <!-- Battery indicator (top-right of screen) -->
+  <rect x="306" y="148" width="24" height="10" rx="2" fill="none" stroke="#39c5bb" stroke-width="1"/>
+  <rect x="308" y="150" width="14" height="6" rx="1" fill="#39c5bb"/>
+  <rect x="330" y="151" width="3" height="4" rx="1" fill="#39c5bb" opacity="0.5"/>
+
+  <!-- "MIKU" text on device bottom -->
+  <text x="256" y="406" text-anchor="middle" font-size="14" fill="#e8a3b5" font-family="sans-serif" font-weight="bold" letter-spacing="4" opacity="0.8">MIKU</text>
+
+  <!-- Twintail decorations (top corners of device) -->
+  <g filter="url(#softGlow)">
+    <!-- Left twintail hint -->
+    <path d="M140 130 Q120 100 130 70 Q135 85 145 95 Q138 110 148 125" fill="#39c5bb" opacity="0.5"/>
+    <!-- Right twintail hint -->
+    <path d="M372 130 Q392 100 382 70 Q377 85 367 95 Q374 110 364 125" fill="#39c5bb" opacity="0.5"/>
+  </g>
+
+  <!-- Status text at bottom -->
+  <text x="256" y="462" text-anchor="middle" font-size="18" fill="#39c5bb" font-family="sans-serif" font-weight="600" letter-spacing="2">HiBy M500</text>
+  <text x="256" y="482" text-anchor="middle" font-size="11" fill="#8b949e" font-family="sans-serif">Monitor</text>
+</svg>

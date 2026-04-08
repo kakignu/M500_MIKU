@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HiBy M500 Monitor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600;700&display=swap');
+
+  :root {
+    --miku-teal: #39c5bb;
+    --miku-teal-light: #5de0d6;
+    --miku-teal-dark: #2a9d95;
+    --miku-pink: #e8a3b5;
+    --miku-pink-light: #f0c4d0;
+    --bg-dark: #0d1117;
+    --bg-card: #161b22;
+    --bg-card-hover: #1c2230;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #484f58;
+    --border: #30363d;
+    --glow: rgba(57, 197, 187, 0.15);
+    --glow-strong: rgba(57, 197, 187, 0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(57, 197, 187, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(232, 163, 181, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(57, 197, 187, 0.03) 0%, transparent 70%);
+    z-index: 0;
+    animation: bgPulse 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes bgPulse {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 20px 16px;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .header-device {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .device-svg-wrap {
+    flex-shrink: 0;
+    animation: iconFloat 3s ease-in-out infinite;
+    filter: drop-shadow(0 8px 20px rgba(57, 197, 187, 0.4));
+  }
+
+  .device-svg-wrap img {
+    max-width: 280px;
+    height: auto;
+  }
+
+  @keyframes iconFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .header-text { text-align: center; }
+
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--miku-teal-light), var(--miku-pink-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 2px;
+  }
+
+  .header .subtitle {
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 300;
+  }
+
+  .header .tagline {
+    color: var(--miku-teal);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 6px;
+    opacity: 0.7;
+  }
+
+  /* ── Miku twintail deco ── */
+  .miku-deco {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.04;
+  }
+  .miku-deco-left {
+    top: -40px; left: -60px;
+    width: 300px; height: 600px;
+    background: linear-gradient(180deg, var(--miku-teal) 0%, transparent 80%);
+    border-radius: 0 0 120px 0;
+    transform: rotate(-8deg);
+  }
+  .miku-deco-right {
+    top: -40px; right: -60px;
+    width: 300px; height: 600px;
+    background: linear-gradient(180deg, var(--miku-teal) 0%, transparent 80%);
+    border-radius: 0 0 0 120px;
+    transform: rotate(8deg);
+  }
+
+  .connection-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .connection-badge.connected {
+    background: rgba(57, 197, 187, 0.15);
+    color: var(--miku-teal-light);
+    border: 1px solid rgba(57, 197, 187, 0.3);
+  }
+
+  .connection-badge.disconnected {
+    background: rgba(248, 81, 73, 0.15);
+    color: #f85149;
+    border: 1px solid rgba(248, 81, 73, 0.3);
+  }
+
+  .connection-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .connected .dot { background: var(--miku-teal); }
+  .disconnected .dot { background: #f85149; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── Battery Ring ── */
+  .battery-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .battery-ring-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+  }
+
+  .battery-ring-container svg {
+    width: 150px;
+    height: 150px;
+    transform: rotate(-90deg);
+  }
+
+  .battery-ring-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 10;
+  }
+
+  .battery-ring-fill {
+    fill: none;
+    stroke: url(#batteryGradient);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 502;
+    stroke-dashoffset: 502;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 8px rgba(57, 197, 187, 0.5));
+  }
+
+  .battery-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .battery-percent {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--miku-teal-light), var(--miku-pink-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .battery-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
+  .charging-indicator {
+    font-size: 18px;
+    animation: chargeFlash 1.5s ease-in-out infinite;
+  }
+
+  @keyframes chargeFlash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── Compact Metric Tiles (3 col) ── */
+  .metric-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .tile {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+  .tile:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(57, 197, 187, 0.25);
+  }
+
+  .tile-icon {
+    width: 28px; height: 28px;
+    margin: 0 auto 4px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .tile-icon.teal  { background: rgba(57, 197, 187, 0.12); }
+  .tile-icon.pink  { background: rgba(232, 163, 181, 0.12); }
+  .tile-icon.amber { background: rgba(227, 179, 65, 0.12); }
+
+  .tile-val {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+  .tile-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  /* ── Chip Card (DAC / SoC) ── */
+  .chip-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .chip-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+  }
+  .chip-card:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(57, 197, 187, 0.3);
+  }
+  .chip-card:last-child:hover {
+    border-color: rgba(255, 51, 51, 0.3);
+  }
+  .chip-card .chip-svg {
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+  .chip-card .chip-text {
+    min-width: 0;
+  }
+  .chip-card .chip-type,
+  .chip-card .chip-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+  .chip-card .chip-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--miku-teal-light);
+    line-height: 1.3;
+    word-break: break-word;
+  }
+  .chip-card .chip-sub {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* ── Music Note Particles ── */
+  .particles {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    font-size: 16px;
+    opacity: 0;
+    animation: floatUp 6s ease-in infinite;
+  }
+
+  @keyframes floatUp {
+    0% { opacity: 0; transform: translateY(100vh) rotate(0deg); }
+    10% { opacity: 0.3; }
+    90% { opacity: 0.3; }
+    100% { opacity: 0; transform: translateY(-20px) rotate(360deg); }
+  }
+
+  /* ── Status Bar ── */
+  .status-bar {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: var(--text-secondary);
+  }
+
+  .status-bar .refresh-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--miku-teal);
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 10px;
+    font-family: inherit;
+    transition: all 0.2s ease;
+  }
+
+  .status-bar .refresh-btn:hover {
+    background: rgba(57, 197, 187, 0.1);
+    border-color: var(--miku-teal);
+  }
+
+  /* ── Section Header ── */
+  .section-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    border-left: 3px solid var(--miku-teal);
+    padding-left: 10px;
+  }
+
+  /* ── Spec Table ── */
+  .spec-table {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s ease;
+  }
+
+  .spec-row:last-child { border-bottom: none; }
+
+  .spec-row:hover { background: var(--bg-card-hover); }
+
+  .spec-row .spec-icon {
+    font-size: 14px;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  .spec-row .spec-key {
+    font-size: 11px;
+    color: var(--text-secondary);
+    flex: 1;
+  }
+
+  .spec-row .spec-val {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: right;
+    max-width: 55%;
+    word-break: break-word;
+  }
+
+  .spec-val.highlight {
+    color: var(--miku-teal-light);
+  }
+
+  /* ── Disconnected State ── */
+  .disconnected-view {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .disconnected-view .icon { font-size: 64px; margin-bottom: 20px; opacity: 0.5; }
+  .disconnected-view h2 { font-size: 20px; margin-bottom: 8px; color: var(--text-secondary); }
+  .disconnected-view p { color: var(--text-muted); font-size: 14px; line-height: 1.8; }
+
+  .disconnected-view .waiting-animation {
+    margin: 24px auto 0;
+    width: 60px; height: 12px;
+    display: flex; gap: 8px; justify-content: center;
+  }
+  .waiting-animation span {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--miku-teal); opacity: 0.3;
+    animation: waitingDot 1.4s ease-in-out infinite;
+  }
+  .waiting-animation span:nth-child(2) { animation-delay: 0.2s; }
+  .waiting-animation span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes waitingDot {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1.2); }
+  }
+
+  /* ── Low battery warning ── */
+  .battery-ring-container.low .battery-ring-fill {
+    stroke: #f85149 !important;
+    filter: drop-shadow(0 0 12px rgba(248, 81, 73, 0.5));
+    animation: ringPulseWarn 2s ease-in-out infinite;
+  }
+  @keyframes ringPulseWarn {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(248, 81, 73, 0.3)); }
+    50% { filter: drop-shadow(0 0 20px rgba(248, 81, 73, 0.6)); }
+  }
+
+  /* ── Charging glow ── */
+  .battery-ring-container.charging .battery-ring-fill {
+    animation: ringPulseCharge 2s ease-in-out infinite;
+  }
+  @keyframes ringPulseCharge {
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(57, 197, 187, 0.4)); }
+    50% { filter: drop-shadow(0 0 16px rgba(57, 197, 187, 0.7)); }
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .header-device { flex-direction: column; gap: 16px; }
+    .header-text { text-align: center; }
+    .metric-strip { grid-template-columns: repeat(2, 1fr); }
+    .chip-cards { grid-template-columns: 1fr; }
+    .battery-percent { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Miku twintail decoration -->
+<div class="miku-deco miku-deco-left"></div>
+<div class="miku-deco miku-deco-right"></div>
+
+<!-- Music note particles -->
+<div class="particles" id="particles"></div>
+
+<div class="container">
+  <div class="header">
+    <div class="header-device">
+      <!-- M500 製品画像 (白背景をCanvas透過処理) -->
+      <div class="device-svg-wrap">
+        <canvas id="deviceCanvas" style="max-width:280px; height:auto;"></canvas>
+        <img id="deviceImageSrc" crossorigin="anonymous"
+             src="m500_device.jpg"
+             onerror="this.onerror=null; this.src='https://www.mixwave.co.jp/wp-content/uploads/2025/12/hibydigital_m5oo_miku_wh_product_pt02-1200x651.jpg';"
+             style="display:none;"
+             alt="HiBy M500 初音ミク Edition">
+      </div>
+      <div class="header-text">
+        <h1>HiBy M500</h1>
+        <div class="subtitle">初音ミク Edition — Battery & Device Monitor</div>
+        <div class="tagline">♪ Make Music More Musical</div>
+      </div>
+    </div>
+    <div class="connection-badge" id="connectionBadge">
+      <span class="dot"></span>
+      <span id="connectionText">接続確認中...</span>
+    </div>
+    <div class="connection-badge" id="modeBadge" style="display:none; margin-left: 8px;">
+      <span id="modeIcon"></span>
+      <span id="modeText"></span>
+    </div>
+  </div>
+
+  <!-- Connected View -->
+  <div id="connectedView" style="display: none;">
+    <div class="battery-section">
+      <div class="battery-ring-container">
+        <svg viewBox="0 0 180 180">
+          <defs>
+            <linearGradient id="batteryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color: #39c5bb;" />
+              <stop offset="100%" style="stop-color: #e8a3b5;" />
+            </linearGradient>
+          </defs>
+          <circle class="battery-ring-bg" cx="90" cy="90" r="80" />
+          <circle class="battery-ring-fill" id="batteryRing" cx="90" cy="90" r="80" />
+        </svg>
+        <div class="battery-center">
+          <div class="battery-percent" id="batteryPercent">--</div>
+          <div class="battery-label" id="batteryStatus">
+            <span class="charging-indicator" id="chargingIcon" style="display:none;">⚡</span>
+            <span id="statusText">読み込み中</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compact metric tiles -->
+    <div class="metric-strip">
+      <div class="tile">
+        <div class="tile-icon teal"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#39c5bb" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4z"/><path d="M12 16v6"/><circle cx="12" cy="16" r="2" fill="#39c5bb" opacity=".4"/></svg></div>
+        <div class="tile-val" id="tempValue">--</div>
+        <div class="tile-label" id="tempSub">温度</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon amber"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e3b341" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="tile-val" id="voltageValue">--</div>
+        <div class="tile-label">電圧</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon teal"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#39c5bb" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <div class="tile-val" id="healthValue">--</div>
+        <div class="tile-label">ヘルス</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon pink"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a3b5" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M2 10h20"/></svg></div>
+        <div class="tile-val" id="storageValue">--</div>
+        <div class="tile-label">ストレージ</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon amber"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e3b341" stroke-width="2"><path d="M5 12V7a5 5 0 0 1 10 0v5"/><rect x="3" y="12" width="14" height="8" rx="2"/></svg></div>
+        <div class="tile-val" id="pluggedValue">--</div>
+        <div class="tile-label">給電</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon teal"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#39c5bb" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <div class="tile-val" id="uptimeValue">--</div>
+        <div class="tile-label">稼働時間</div>
+      </div>
+    </div>
+
+    <!-- DAC & SoC chip cards with settings-style SVG icons -->
+    <div class="chip-cards">
+      <!-- DAC チップ - Cirrus Logic brand style (horizontal stripe oval) -->
+      <div class="chip-card">
+        <div class="chip-svg">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <defs>
+              <clipPath id="cirrusClip">
+                <ellipse cx="26" cy="24" rx="16" ry="14"/>
+              </clipPath>
+            </defs>
+            <!-- Striped oval logo mark -->
+            <g clip-path="url(#cirrusClip)">
+              <line x1="6" y1="11" x2="42" y2="11" stroke="#39c5bb" stroke-width="1.8"/>
+              <line x1="6" y1="14" x2="42" y2="14" stroke="#39c5bb" stroke-width="1.8"/>
+              <line x1="6" y1="17" x2="42" y2="17" stroke="#39c5bb" stroke-width="1.8"/>
+              <line x1="6" y1="20" x2="42" y2="20" stroke="#39c5bb" stroke-width="1.8"/>
+              <line x1="6" y1="23" x2="42" y2="23" stroke="#39c5bb" stroke-width="1.8"/>
+              <line x1="6" y1="26" x2="42" y2="26" stroke="#39c5bb" stroke-width="1.8"/>
+              <line x1="6" y1="29" x2="42" y2="29" stroke="#39c5bb" stroke-width="1.8"/>
+              <line x1="6" y1="32" x2="42" y2="32" stroke="#39c5bb" stroke-width="1.8"/>
+              <line x1="6" y1="35" x2="42" y2="35" stroke="#39c5bb" stroke-width="1.8"/>
+              <line x1="6" y1="38" x2="42" y2="38" stroke="#39c5bb" stroke-width="1.8"/>
+            </g>
+            <!-- Lines extending left (like the actual logo) -->
+            <g stroke="#39c5bb" stroke-width="1.5" stroke-linecap="round" opacity="0.7">
+              <line x1="2" y1="14" x2="14" y2="14"/>
+              <line x1="4" y1="17" x2="13" y2="17"/>
+              <line x1="3" y1="20" x2="12" y2="20"/>
+              <line x1="2" y1="23" x2="11" y2="23"/>
+              <line x1="3" y1="26" x2="12" y2="26"/>
+              <line x1="4" y1="29" x2="13" y2="29"/>
+              <line x1="2" y1="32" x2="14" y2="32"/>
+            </g>
+          </svg>
+        </div>
+        <div class="chip-text">
+          <div class="chip-label" style="color:#39c5bb;">CIRRUS LOGIC</div>
+          <div class="chip-name" id="specDac" style="color:#39c5bb;">--</div>
+          <div class="chip-sub">32bit / 384kHz / DSD512</div>
+        </div>
+      </div>
+      <!-- SoC - Snapdragon 680 -->
+      <div class="chip-card">
+        <div class="chip-svg">
+          <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+            <defs>
+              <linearGradient id="sdBg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#1a0a1e"/>
+                <stop offset="100%" stop-color="#0e0612"/>
+              </linearGradient>
+              <filter id="sdGlow">
+                <feGaussianBlur stdDeviation="2" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            <!-- Background -->
+            <rect width="64" height="64" rx="6" fill="url(#sdBg)"/>
+            <rect x="1" y="1" width="62" height="62" rx="5" fill="none" stroke="#e8a3b5" stroke-width="0.5" opacity="0.2"/>
+
+            <!-- Snapdragon flame logo (centered, stylized) -->
+            <g transform="translate(14,6) scale(1.4)" filter="url(#sdGlow)">
+              <!-- Main flame body -->
+              <path d="M16 4 C18 1 15 -1 12 1 C9 3 7 7 7 11 C7 15 10 17 13 15 C16 13 14 9 12 8 C10 7 9 10 9 13 C9 16 12 19 15 18 C18 17 20 14 20 10 C20 6 18 4 16 4Z"
+                    fill="#e8a3b5" opacity="0.9"/>
+              <!-- Inner flame highlight -->
+              <path d="M14 6 C15.5 4 14 2.5 12 4 C10 6 9.5 9 10 12 C10.5 14 12 14.5 13 13 C14 11.5 13 9 12 8.5"
+                    fill="#f0c4d0" opacity="0.6"/>
+              <!-- Bright core -->
+              <ellipse cx="12" cy="10" rx="2" ry="3" fill="#f8dde5" opacity="0.3"/>
+            </g>
+
+            <!-- "Snapdragon" text -->
+            <text x="32" y="42" text-anchor="middle" font-family="sans-serif" font-size="5.5" font-weight="700" fill="#e8a3b5" opacity="0.9" letter-spacing="0.5">Snapdragon</text>
+            <!-- "680" text -->
+            <text x="32" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="900" fill="#ffffff" opacity="0.85">680</text>
+          </svg>
+        </div>
+        <div class="chip-text">
+          <div class="chip-label" style="color:#e8a3b5;">SNAPDRAGON</div>
+          <div class="chip-name" id="specSoc" style="color:#e8a3b5;">--</div>
+          <div class="chip-sub"><span id="specCores">--</span> cores &middot; <span id="specFreq">--</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RAM & Storage chip cards -->
+    <div class="chip-cards">
+      <!-- RAM チップ (ティール / 4GB) -->
+      <div class="chip-card">
+        <div class="chip-svg">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <defs>
+              <linearGradient id="ramGlow" x1="50%" y1="100%" x2="50%" y2="30%">
+                <stop offset="0%" stop-color="#39c5bb" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#39c5bb" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="ramChipFace" x1="50%" y1="0%" x2="50%" y2="100%">
+                <stop offset="0%" stop-color="#1a3a38"/>
+                <stop offset="100%" stop-color="#0e2220"/>
+              </linearGradient>
+            </defs>
+            <!-- Glow base -->
+            <rect x="7" y="9" width="34" height="34" rx="4" fill="url(#ramGlow)" opacity="0.4"/>
+            <!-- Chip body (3D perspective - bottom face) -->
+            <path d="M10 14 L10 38 L38 38 L38 14 Z" fill="#0a1614" stroke="#39c5bb" stroke-width="0.5" opacity="0.4"/>
+            <!-- Chip body (top face - teal tinted glass) -->
+            <rect x="10" y="10" width="28" height="28" rx="3" fill="url(#ramChipFace)"/>
+            <rect x="10" y="10" width="28" height="28" rx="3" fill="none" stroke="#39c5bb" stroke-width="0.8" opacity="0.6"/>
+            <!-- Inner die area -->
+            <rect x="14" y="14" width="20" height="20" rx="1.5" fill="#0d2825" stroke="#39c5bb" stroke-width="0.4" opacity="0.5"/>
+            <!-- "4GB" label on die -->
+            <text x="24" y="27" font-family="sans-serif" font-size="8" font-weight="800" fill="#39c5bb" text-anchor="middle" opacity="0.85">4GB</text>
+            <!-- Pin lines -->
+            <g stroke="#39c5bb" stroke-width="0.5" opacity="0.4">
+              <line x1="15" y1="38" x2="15" y2="42"/><line x1="19" y1="38" x2="19" y2="42"/>
+              <line x1="23" y1="38" x2="23" y2="42"/><line x1="27" y1="38" x2="27" y2="42"/>
+              <line x1="31" y1="38" x2="31" y2="42"/><line x1="35" y1="38" x2="35" y2="42"/>
+            </g>
+            <!-- Surface detail lines -->
+            <line x1="14" y1="18" x2="34" y2="18" stroke="#39c5bb" stroke-width="0.3" opacity="0.2"/>
+            <line x1="14" y1="30" x2="34" y2="30" stroke="#39c5bb" stroke-width="0.3" opacity="0.2"/>
+          </svg>
+        </div>
+        <div class="chip-text">
+          <div class="chip-label" style="color:#39c5bb;">MEMORY</div>
+          <div class="chip-name" id="specRam" style="color:#39c5bb;">--</div>
+          <div class="chip-sub">LPDDR4X</div>
+        </div>
+      </div>
+      <!-- Storage チップ (ピンク / 64GB) -->
+      <div class="chip-card">
+        <div class="chip-svg">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <defs>
+              <linearGradient id="storGlow" x1="50%" y1="100%" x2="50%" y2="30%">
+                <stop offset="0%" stop-color="#e8a3b5" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#e8a3b5" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="storChipFace" x1="50%" y1="0%" x2="50%" y2="100%">
+                <stop offset="0%" stop-color="#3a1a28"/>
+                <stop offset="100%" stop-color="#220e18"/>
+              </linearGradient>
+            </defs>
+            <!-- Glow base -->
+            <rect x="7" y="9" width="34" height="34" rx="4" fill="url(#storGlow)" opacity="0.4"/>
+            <!-- Chip body (bottom shadow) -->
+            <path d="M10 14 L10 38 L38 38 L38 14 Z" fill="#140a10" stroke="#e8a3b5" stroke-width="0.5" opacity="0.4"/>
+            <!-- Chip body (top face - pink tinted glass) -->
+            <rect x="10" y="10" width="28" height="28" rx="3" fill="url(#storChipFace)"/>
+            <rect x="10" y="10" width="28" height="28" rx="3" fill="none" stroke="#e8a3b5" stroke-width="0.8" opacity="0.6"/>
+            <!-- Inner die area -->
+            <rect x="14" y="14" width="20" height="20" rx="1.5" fill="#250d1a" stroke="#e8a3b5" stroke-width="0.4" opacity="0.5"/>
+            <!-- "64GB" label on die -->
+            <text x="24" y="27" font-family="sans-serif" font-size="7" font-weight="800" fill="#e8a3b5" text-anchor="middle" opacity="0.85">64GB</text>
+            <!-- Pin lines -->
+            <g stroke="#e8a3b5" stroke-width="0.5" opacity="0.4">
+              <line x1="15" y1="38" x2="15" y2="42"/><line x1="19" y1="38" x2="19" y2="42"/>
+              <line x1="23" y1="38" x2="23" y2="42"/><line x1="27" y1="38" x2="27" y2="42"/>
+              <line x1="31" y1="38" x2="31" y2="42"/><line x1="35" y1="38" x2="35" y2="42"/>
+            </g>
+            <!-- Surface detail lines -->
+            <line x1="14" y1="18" x2="34" y2="18" stroke="#e8a3b5" stroke-width="0.3" opacity="0.2"/>
+            <line x1="14" y1="30" x2="34" y2="30" stroke="#e8a3b5" stroke-width="0.3" opacity="0.2"/>
+          </svg>
+        </div>
+        <div class="chip-text">
+          <div class="chip-label" style="color:#e8a3b5;">STORAGE</div>
+          <div class="chip-name" id="specStorage" style="color:#e8a3b5;">--</div>
+          <div class="chip-sub">UFS / 64GB 内蔵</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hardware specs (compact) -->
+    <div class="section-header">Hardware</div>
+    <div class="spec-table" id="specHardware">
+      <div class="spec-row">
+        <span class="spec-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg></span>
+        <span class="spec-key">CPU ABI</span>
+        <span class="spec-val" id="specAbi">--</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span>
+        <span class="spec-key">画面</span>
+        <span class="spec-val" id="specScreen">--</span>
+      </div>
+    </div>
+
+    <!-- Software -->
+    <div class="section-header">Firmware</div>
+    <div class="spec-table" id="specSoftware">
+      <div class="spec-row">
+        <span class="spec-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4m0 14v4M4.22 4.22l2.83 2.83m9.9 9.9l2.83 2.83M1 12h4m14 0h4M4.22 19.78l2.83-2.83m9.9-9.9l2.83-2.83"/></svg></span>
+        <span class="spec-key">Android</span>
+        <span class="spec-val" id="specAndroid">--</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span>
+        <span class="spec-key">ビルド</span>
+        <span class="spec-val" id="specBuild">--</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <span class="spec-key">パッチ</span>
+        <span class="spec-val" id="specPatch">--</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+        <span class="spec-key">カーネル</span>
+        <span class="spec-val" id="specKernel">--</span>
+      </div>
+    </div>
+
+    <!-- Wireless (WiFi & Bluetooth cards) -->
+    <div class="section-header">Wireless</div>
+    <div class="chip-cards">
+      <!-- WiFi カード -->
+      <div class="chip-card" id="wifiCard">
+        <div class="chip-svg">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <g id="wifiIconWaves" stroke="#39c5bb" stroke-width="2.5" stroke-linecap="round" fill="none">
+              <path d="M6 18a22 22 0 0 1 32 0" opacity="0.35"/>
+              <path d="M11 23a15 15 0 0 1 22 0" opacity="0.6"/>
+              <path d="M16 28a8 8 0 0 1 12 0" opacity="0.85"/>
+            </g>
+            <circle id="wifiDot" cx="22" cy="34" r="3" fill="#39c5bb"/>
+          </svg>
+        </div>
+        <div class="chip-text">
+          <div class="chip-label" style="color:#39c5bb;">WIFI</div>
+          <div class="chip-name" id="wifiSsid" style="color:#39c5bb;">--</div>
+          <div class="chip-sub" id="wifiDetail">--</div>
+        </div>
+      </div>
+      <!-- Bluetooth カード -->
+      <div class="chip-card" id="btCard">
+        <div class="chip-svg">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="8" y="4" width="28" height="36" rx="8" fill="none" stroke="#5b9bd5" stroke-width="1.5" opacity="0.3"/>
+            <g stroke="#5b9bd5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 14l10 8-10 8"/>
+              <path d="M27 14l-10 8 10 8"/>
+              <line x1="22" y1="10" x2="22" y2="34"/>
+            </g>
+          </svg>
+        </div>
+        <div class="chip-text">
+          <div class="chip-label" style="color:#5b9bd5;">BLUETOOTH</div>
+          <div class="chip-name" id="btDevice" style="color:#5b9bd5;">--</div>
+          <div class="chip-sub" id="btDetail">--</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Network (その他) -->
+    <div class="section-header">Network</div>
+    <div class="spec-table" id="specNetwork">
+      <div class="spec-row">
+        <span class="spec-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="#8b949e"/></svg></span>
+        <span class="spec-key">WiFi IP</span>
+        <span class="spec-val" id="specWifiIp">--</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2"><path d="M6.5 6.5L17.5 17.5"/><path d="M7 2l5 5-5 5"/><path d="M17 12l-5 5 5 5"/></svg></span>
+        <span class="spec-key">BT MAC</span>
+        <span class="spec-val" id="specBtMac">--</span>
+      </div>
+      <div class="spec-row">
+        <span class="spec-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h.01M7 12h.01M7 17h.01M12 7h.01M12 12h.01"/></svg></span>
+        <span class="spec-key">シリアル</span>
+        <span class="spec-val" id="specSerial">--</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disconnected View -->
+  <div id="disconnectedView" style="display: none;">
+    <div class="disconnected-view">
+      <div class="icon">🎵</div>
+      <h2>M500 が見つかりません</h2>
+      <p>
+        USB ケーブルで MacBook に接続してください。<br>
+        USB デバッグが有効になっていることを確認してください。<br>
+        接続されると自動的に表示が更新されます。
+      </p>
+      <div class="waiting-animation"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <span>最終更新: <span id="lastUpdate">--</span></span>
+    <button class="refresh-btn" onclick="fetchData()">🔄 更新</button>
+  </div>
+</div>
+
+<script>
+  const API_URL = 'http://127.0.0.1:39539/api/status';
+  const POLL_INTERVAL = 5000;
+
+  // ── M500 画像の白背景を透過処理 ──
+  (function() {
+    const img = document.getElementById('deviceImageSrc');
+    const canvas = document.getElementById('deviceCanvas');
+    function removeWhiteBg() {
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const d = imageData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], g = d[i+1], b = d[i+2];
+        const brightness = Math.max(r, g, b);
+        // 白に近いピクセルをグラデーションで透過
+        if (brightness > 230) {
+          d[i+3] = Math.round(Math.max(0, (255 - brightness) / (255 - 230) * 255));
+        }
+      }
+      ctx.putImageData(imageData, 0, 0);
+    }
+    if (img.complete && img.naturalWidth > 0) {
+      removeWhiteBg();
+    } else {
+      img.onload = removeWhiteBg;
+    }
+  })();
+
+  // Music note particles
+  function createParticles() {
+    const container = document.getElementById('particles');
+    const notes = ['♪', '♫', '♬', '♩', '🎵', '🎶'];
+    for (let i = 0; i < 12; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.textContent = notes[i % notes.length];
+      p.style.left = Math.random() * 100 + '%';
+      p.style.animationDelay = Math.random() * 6 + 's';
+      p.style.animationDuration = (5 + Math.random() * 4) + 's';
+      p.style.fontSize = (12 + Math.random() * 14) + 'px';
+      container.appendChild(p);
+    }
+  }
+  createParticles();
+
+  function updateBatteryRing(level) {
+    const ring = document.getElementById('batteryRing');
+    const circumference = 2 * Math.PI * 80; // ~502
+    const offset = circumference - (level / 100) * circumference;
+    ring.style.strokeDashoffset = offset;
+  }
+
+  function updateUI(data) {
+    const badge = document.getElementById('connectionBadge');
+    const connectedView = document.getElementById('connectedView');
+    const disconnectedView = document.getElementById('disconnectedView');
+
+    if (!data.connected) {
+      badge.className = 'connection-badge disconnected';
+      document.getElementById('connectionText').textContent = '未接続';
+      connectedView.style.display = 'none';
+      disconnectedView.style.display = 'block';
+      return;
+    }
+
+    badge.className = 'connection-badge connected';
+    document.getElementById('connectionText').textContent =
+      (data.model || 'HiBy M500') + ' 接続中';
+    connectedView.style.display = 'block';
+    disconnectedView.style.display = 'none';
+
+    // Connection mode badge
+    const modeBadge = document.getElementById('modeBadge');
+    const modeIcon = document.getElementById('modeIcon');
+    const modeText = document.getElementById('modeText');
+    if (data.connection_mode && data.connection_mode !== 'disconnected') {
+      modeBadge.style.display = 'inline-flex';
+      modeBadge.className = 'connection-badge connected';
+      if (data.connection_mode === 'wifi') {
+        modeIcon.textContent = '📶';
+        modeText.textContent = 'WiFi' + (data.wifi_ip ? ' (' + data.wifi_ip + ')' : '');
+      } else {
+        modeIcon.textContent = '🔌';
+        modeText.textContent = 'USB';
+      }
+    } else {
+      modeBadge.style.display = 'none';
+    }
+
+    const b = data.battery;
+    if (!b) return;
+
+    // Battery ring
+    document.getElementById('batteryPercent').textContent = b.level + '%';
+    updateBatteryRing(b.level);
+
+    // Charging status + ring effects
+    const isCharging = b.status === '充電中';
+    document.getElementById('chargingIcon').style.display = isCharging ? 'inline' : 'none';
+    document.getElementById('statusText').textContent = b.status;
+
+    const ringContainer = document.querySelector('.battery-ring-container');
+    ringContainer.classList.toggle('charging', isCharging);
+    ringContainer.classList.toggle('low', b.level <= 20 && !isCharging);
+
+    // Metric tiles
+    document.getElementById('tempValue').textContent = b.temperature + '°C';
+    document.getElementById('tempSub').textContent =
+      parseFloat(b.temperature) > 40 ? '温度 ⚠' : '温度';
+
+    document.getElementById('voltageValue').textContent =
+      b.voltage !== '0' ? (parseFloat(b.voltage) / 1000).toFixed(2) + 'V' : '--';
+    document.getElementById('healthValue').textContent = b.health || '--';
+    document.getElementById('pluggedValue').textContent = b.plugged || '--';
+    document.getElementById('storageValue').textContent = data.storage || '--';
+    document.getElementById('uptimeValue').textContent = data.uptime || '--';
+
+    // Device info (chip cards + spec tables)
+    const d = data.device;
+    if (d) {
+      document.getElementById('specDac').textContent = d.dac_chip || '--';
+      document.getElementById('specSoc').textContent = d.soc_model || '--';
+      document.getElementById('specCores').textContent =
+        d.cpu_cores ? d.cpu_cores + ' cores' : '--';
+      document.getElementById('specFreq').textContent = d.cpu_freq_max || '--';
+      document.getElementById('specAbi').textContent = d.cpu_abi || '--';
+      document.getElementById('specRam').textContent = d.ram_total || '--';
+      document.getElementById('specStorage').textContent = data.storage || '64GB';
+      document.getElementById('specScreen').textContent = d.screen_resolution || '--';
+      document.getElementById('specAndroid').textContent =
+        d.android_version !== 'Unknown'
+          ? d.android_version + ' (SDK ' + d.sdk_version + ')' : '--';
+      document.getElementById('specBuild').textContent = d.build_display || '--';
+      document.getElementById('specPatch').textContent = d.security_patch || '--';
+      document.getElementById('specKernel').textContent = d.kernel_version || '--';
+      document.getElementById('specSerial').textContent = d.serial_number || '--';
+    }
+
+    // Wireless info (WiFi & Bluetooth cards)
+    const w = data.wireless;
+    if (w) {
+      // WiFi card
+      const wifiCard = document.getElementById('wifiCard');
+      if (w.wifi_on) {
+        if (w.wifi_ssid) {
+          document.getElementById('wifiSsid').textContent = w.wifi_ssid;
+          const parts = [];
+          if (w.wifi_signal) parts.push(w.wifi_signal);
+          if (w.wifi_rssi) parts.push(w.wifi_rssi + ' dBm');
+          if (w.wifi_link_speed) parts.push(w.wifi_link_speed);
+          document.getElementById('wifiDetail').textContent = parts.join(' · ') || '--';
+          document.getElementById('specWifiIp').textContent = w.wifi_ip || '--';
+        } else {
+          document.getElementById('wifiSsid').textContent = 'ON';
+          document.getElementById('wifiDetail').textContent = '未接続';
+        }
+        wifiCard.style.borderColor = 'rgba(57,197,187,0.25)';
+      } else {
+        document.getElementById('wifiSsid').textContent = 'OFF';
+        document.getElementById('wifiDetail').textContent = '--';
+        wifiCard.style.borderColor = '';
+      }
+
+      // Bluetooth card
+      const btCard = document.getElementById('btCard');
+      if (w.bt_on) {
+        if (w.bt_connected_device) {
+          document.getElementById('btDevice').textContent = w.bt_connected_device;
+          const btParts = [];
+          if (w.bt_codec) btParts.push(w.bt_codec);
+          document.getElementById('btDetail').textContent = btParts.join(' · ') || '接続中';
+        } else {
+          document.getElementById('btDevice').textContent = 'ON';
+          document.getElementById('btDetail').textContent = '未接続';
+        }
+        btCard.style.borderColor = 'rgba(91,155,213,0.25)';
+        document.getElementById('specBtMac').textContent = w.bt_mac || '--';
+      } else {
+        document.getElementById('btDevice').textContent = 'OFF';
+        document.getElementById('btDetail').textContent = '--';
+        btCard.style.borderColor = '';
+      }
+    }
+
+    document.getElementById('lastUpdate').textContent =
+      new Date().toLocaleTimeString('ja-JP');
+  }
+
+  async function fetchData() {
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      updateUI(data);
+    } catch (e) {
+      // API サーバーに接続できない場合
+      updateUI({ connected: false });
+      document.getElementById('connectionText').textContent = 'サーバー未起動';
+    }
+  }
+
+  // 初回取得 + ポーリング
+  fetchData();
+  setInterval(fetchData, POLL_INTERVAL);
+</script>
+</body>
+</html>

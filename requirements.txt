@@ -1,0 +1,2 @@
+pyobjc-framework-Cocoa>=10.0
+pyobjc-framework-WebKit>=10.0
