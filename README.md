@@ -1,7 +1,16 @@
 # HiBy M500 Monitor - Miku Edition
 
+[![Build macOS App](https://github.com/kakignu/M500_MIKU/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/kakignu/M500_MIKU/actions/workflows/build-and-release.yml)
+
 macOS メニューバーに常駐する HiBy M500 バッテリーモニターアプリです。
 ミクカラーのダッシュボードで、バッテリー状態をリッチに表示します。
+
+## ダウンロード
+
+👉 **[最新版をダウンロード（macOS）](https://github.com/kakignu/M500_MIKU/releases/latest/download/HiBy_M500_Monitor.zip)**
+
+> リリースがまだない場合は [Actions のビルド成果物](https://github.com/kakignu/M500_MIKU/actions/workflows/build-and-release.yml) からダウンロードできます。
+> 最新の成功したビルドを開き、ページ下部の **Artifacts** セクションから `HiBy-M500-Monitor-macOS` をダウンロードしてください。
 
 ## 機能
 
@@ -17,7 +26,7 @@ macOS メニューバーに常駐する HiBy M500 バッテリーモニターア
 - adb (`brew install android-platform-tools`)
 - HiBy M500 の USB デバッグが有効であること
 
-## セットアップ
+## セットアップ（ソースから実行する場合）
 
 ```bash
 # 依存関係のインストール
