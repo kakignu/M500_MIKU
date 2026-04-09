@@ -5,12 +5,22 @@
 macOS メニューバーに常駐する HiBy M500 バッテリーモニターアプリです。
 ミクカラーのダッシュボードで、バッテリー状態をリッチに表示します。
 
+<p align="center">
+  <img src="m500_device.jpg" alt="HiBy M500 初音ミク Edition" width="280">
+</p>
+
 ## ダウンロード
 
 👉 **[最新版をダウンロード（macOS）](https://github.com/kakignu/M500_MIKU/releases/latest/download/HiBy_M500_Monitor.zip)**
 
 > リリースがまだない場合は [Actions のビルド成果物](https://github.com/kakignu/M500_MIKU/actions/workflows/build-and-release.yml) からダウンロードできます。
 > 最新の成功したビルドを開き、ページ下部の **Artifacts** セクションから `HiBy-M500-Monitor-macOS` をダウンロードしてください。
+
+## スクリーンショット
+
+<p align="center">
+  <img src="screenshots/dashboard.png" alt="ダッシュボード画面" width="700">
+</p>
 
 ## 機能
 
